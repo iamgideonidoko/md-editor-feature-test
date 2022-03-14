@@ -15,7 +15,7 @@ mdParser.use(markdownItAttrs, {
   // optional, these are default options
   leftDelimiter: '{',
   rightDelimiter: '}',
-  allowedAttributes: [], // empty array = all attributes are allowed
+  allowedAttributes: ['id', 'class'], // empty array = all attributes are allowed
 });
 mdParser.use(markdownItContainer, 'embedhtml', {});
 
