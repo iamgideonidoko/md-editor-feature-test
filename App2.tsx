@@ -5,9 +5,15 @@ import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import markdownItAttrs from 'markdown-it-attrs';
 import markdownItContainer from 'markdown-it-container';
+import { decode } from 'html-entities';
 
 // Register plugins if required
 // MdEditor.use(YOUR_PLUGINS_HERE);
+
+const extractEmbedRegex =
+  /<div(?:(?!\/\/)(?!\/\*)[^'"]|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\/\/.*(?:\n)|\/\*(?:(?:.|\s))*?\*\/)*?<\/div>/gi;
+const stripScriptRegex =
+  /<script(?:(?!\/\/)(?!\/\*)[^'"]|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\/\/.*(?:\n)|\/\*(?:(?:.|\s))*?\*\/)*?<\/script>/gi;
 
 // Initialize a markdown parser
 const mdParser = new MarkdownIt(/* Markdown-it options */);
@@ -38,6 +44,25 @@ function stripScripts(s: string) {
 const embedHtml = (html: string, text: string) => {
   console.clear();
   console.log('html => ', html);
+  let newHtml = html;
+  const embedBoxes = html.match(extractEmbedRegex);
+
+  if (embedBoxes) {
+    embedBoxes.forEach((box) => {
+      // strip opening and closing tags
+      const boxContent = box.replace(/(^<div.*?>|<\/div>)/gi, '');
+      const realBoxContent = boxContent.replace(/<[^>]+>/g, '');
+      const decodedBoxContent = decode(realBoxContent);
+      newHtml = newHtml.replace(
+        box,
+        '<div>' + decodedBoxContent.replace(stripScriptRegex, '') + '</div>'
+      );
+    });
+  }
+
+  console.log('newHtml => ', newHtml);
+
+  return html;
   //create a parent div
   const parent = document.createElement('div');
   parent.innerHTML = html;
