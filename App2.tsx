@@ -53,10 +53,7 @@ const embedHtml = (html: string, text: string) => {
       const boxContent = box.replace(/(^<div.*?>|<\/div>)/gi, '');
       const realBoxContent = boxContent.replace(/<[^>]+>/g, '');
       const decodedBoxContent = decode(realBoxContent);
-      newHtml = newHtml.replace(
-        box,
-        '<div>' + decodedBoxContent.replace(stripScriptRegex, '') + '</div>'
-      );
+      newHtml = newHtml.replace(box, '<div>' + decodedBoxContent + '</div>');
     });
   }
 
