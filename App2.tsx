@@ -30,20 +30,9 @@ function handleEditorChange({ html, text }) {
   // console.log('handleEditorChange', html);
 }
 
-function stripScripts(s: string) {
-  var div = document.createElement('div');
-  div.innerHTML = s;
-  var scripts = div.getElementsByTagName('script');
-  var i = scripts.length;
-  while (i--) {
-    scripts[i].parentNode.removeChild(scripts[i]);
-  }
-  return div.innerHTML;
-}
-
 const embedHtml = (html: string, text: string) => {
   console.clear();
-  console.log('html => ', html);
+  console.log('htmsl => ', html);
   let newHtml = html;
   const embedBoxes = html.match(extractEmbedRegex);
 
@@ -53,23 +42,13 @@ const embedHtml = (html: string, text: string) => {
       const boxContent = box.replace(/(^<div.*?>|<\/div>)/gi, '');
       const realBoxContent = boxContent.replace(/<[^>]+>/g, '');
       const decodedBoxContent = decode(realBoxContent);
-      newHtml = newHtml.replace(box, '<div>' + decodedBoxContent + '</div>');
+      newHtml = newHtml.replace(box, '<div>' + decodedBoxContent.replace(stripScriptRegex, '')  + '</div>');
     });
   }
 
-  console.log('newHtml => ', newHtml);
+  console.log('newHtml => ', newHtml)s
 
-  return html;
-  //create a parent div
-  const parent = document.createElement('div');
-  parent.innerHTML = html;
-  // get all elements with a class of `embedhtml`
-  const embedDivs = parent.getElementsByClassName('embedhtml');
-  for (let i = 0; i < embedDivs.length; i++) {
-    // decode text and inject
-    embedDivs[i].innerHTML = stripScripts(embedDivs[i]?.textContent);
-  }
-  return parent.innerHTML;
+  return newHtml;
 };
 
 const App = () => {
